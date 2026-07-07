@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv*/
+*.egg-info/
+
+# Data files
+*.csv
+*.xlsx
+*.json
+*.pt
+*.docx
+*.txt
+
+# Environment
+.xhs_*
+.env
+.cookies*
+
+# System
+.openclaw/config.json
+__pycache__/
+.clawhub/
+
+# Images
+*.png
+*.jpg
+*.jpeg
+
+# Reports
+validation_output/
+backtest/
+data/
+gtp-analysis/
