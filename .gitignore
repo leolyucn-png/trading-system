@@ -33,3 +33,4 @@ validation_output/
 backtest/
 data/
 gtp-analysis/
+vibe_env/
