@@ -34,3 +34,20 @@ backtest/
 data/
 gtp-analysis/
 vibe_env/
+# Python虚拟环境
+vibe_env/
+.supervision_env/
+.venv/
+env/
+venv/
+
+# node_modules
+node_modules/
+
+# 大文件
+*.dylib
+*.so
+*.bin
+__pycache__/
+*.pyc
+.DS_Store
