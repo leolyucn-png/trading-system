@@ -8,7 +8,12 @@ If `BOOTSTRAP.md` exists, that's your birth certificate. Follow it, figure out w
 
 ## Session Startup — 🧠 ELITE MEMORY 强制规则
 
-每次会话启动，**必须按顺序执行以下步骤**，不可跳过：
+每次会话启动，**必须按顺序执行以下步骤**，不可跳过。
+
+### 第0步：核实日期与GATE（🔴 必须用系统命令，禁止推算）
+- 执行 `date "+%Y-%m-%d %A %H:%M GMT+8"` 获取真实日期与星期
+- 读 SESSION-STATE.md 获取当前 GATE 状态
+- **禁止凭记忆推算日期**——你有日期错报前科，此步为疫苗
 
 ### 第1步：读 SESSION-STATE.md
 - 这是热内存，包含当前会话状态、持仓、待办
@@ -32,6 +37,17 @@ If `BOOTSTRAP.md` exists, that's your birth certificate. Follow it, figure out w
 
 **以上步骤为强制项，不可跳过、不可简化。**
 在回答用户问题之前必须先完成记忆加载。
+
+## 🛂 启动自检行（强制输出）
+
+每次新会话的**第一条输出**，必须以如下格式开头，不得省略：
+
+```
+启动自检: 日期YYYY-MM-DD(周X) / GATE 🟢🟡🔴 / STATE版本YYYY-MM-DD HH:MM / 最近违规X条
+```
+
+> 没有这一行的会话输出，视同未读档案，全部无效。
+> 日期来源于第0步的系统命令输出，不是推算。
 
 ## Memory
 

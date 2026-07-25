@@ -21,7 +21,7 @@
  python guanyu_v4.py --health # 只做健康检查(盘前跑一次)
 """
 
-import json, sys, time, datetime as dt
+import json, sys, time, os, datetime as dt
 import requests
 
 TIMEOUT = 6; RETRY = 2
@@ -32,6 +32,7 @@ ETF_POOL = {
     "sh512480":"半导体ETF","sh515790":"光伏ETF","sh512690":"酒ETF",
     "sh512170":"医疗ETF","sh512880":"证券ETF","sh516160":"新能源ETF",
     "sh512400":"有色ETF","sh512660":"军工ETF","sh515880":"通信ETF",
+    "sh562500":"机器人ETF","sz159770":"机器人AI",
     "sz159819":"AI_ETF","sh512800":"银行ETF","sz159928":"消费ETF",
     "sz159865":"养殖ETF","sh512010":"医药ETF","sz159852":"软件ETF",
 }
@@ -104,8 +105,9 @@ line1 = Line("线1·ETF方向", [
 ])
 
 def fetch_boards():
-    url = "https://push2.eastmoney.com/api/qt/clist/get?pn=1&pz=500&po=1&np=1&fltt=2&fid=f62&fs=m:90+t:3&fields=f3,f14,f62"
-    raw = _get(url, HEADERS_STD)
+    url = "https://push2.eastmoney.com/api/qt/clist/get?pn=1&pz=200&po=1&np=1&fltt=2&fid=f62&fs=m:90+t:3&fields=f3,f14,f62"
+    h = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36", "Referer": "https://quote.eastmoney.com/"}
+    raw = _get(url, h)
     return parse_boards(raw) if raw else None
 
 def dark_flow(boards):
@@ -146,4 +148,21 @@ if __name__ == "__main__":
         print("\n🌊 线4 暗流:")
         if flows:
             for b in flows: print(f" {b['board']:<10} {b['pct']:+.2f}% 主力{b['main_inflow']/1e8:.2f}亿")
+        
+        # 🆕 暗流历史存档 (每日累积, 不覆盖)
+        flow_dir = os.path.expanduser("~/memory/暗流历史")
+        os.makedirs(flow_dir, exist_ok=True)
+        today = dt.datetime.now().strftime('%Y-%m-%d')
+        rec = {"timestamp": dt.datetime.now().isoformat(timespec="minutes"),
+               "etf_top5": [(q['name'], q['pct']) for q in etfs[:5]],
+               "dark_flow": [{"board": b['board'], "pct": b['pct'], "inflow_yi": round(b['main_inflow']/1e8, 2)} for b in (flows or [])[:10]]}
+        path = os.path.join(flow_dir, f"{today}.json")
+        existing = []
+        if os.path.exists(path):
+            try:
+                with open(path) as f: existing = json.load(f)
+            except: pass
+        existing.append(rec)
+        with open(path, 'w') as f: json.dump(existing, f, ensure_ascii=False)
+    
     print("="*56)

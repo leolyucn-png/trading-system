@@ -1,0 +1,34 @@
+# claw_harness 全局底层配置
+# 强制完整输出规则 — 禁止任何截断、省略、压缩
+
+[max_output]
+tokens = 16000
+# 大幅拉高输出上限，彻底解决字数限制截断
+
+[stream]
+output = false
+# 关闭流式分段截断，完整输出完毕再展示全文
+
+[truncate]
+threshold = 0
+# 关闭自动截断机制，禁止任何情况省略内容
+
+[temperature]
+value = 0.1
+# 低温，确保输出稳定一致，不漂移
+
+[full_text]
+force = true
+# 全局强制完整输出规则
+
+[constraints]
+no_summary = true         # 禁止摘要输出
+no_simplify = true        # 禁止简化输出
+no_compress = true        # 禁止压缩输出
+no_omit_reasoning = true  # 禁止省略推导过程
+no_omit_tables = true     # 禁止省略表格
+no_omit_points = true     # 禁止省略分点
+no_omit_appendix = true   # 禁止省略附录
+no_omit_cases = true      # 禁止省略案例
+no_auto_abbreviate = true # 禁止自动缩写
+preserve_full = true      # 保留全部原始内容

@@ -30,10 +30,33 @@ def parse_sina(raw):
         return out if len(out) >= MA_N + 1 else None
     except: return None
 
+def get_realtime_pct():
+    """获取沪深300实时涨跌幅（指数格式 fields: name,price,change,%,vol,amount）"""
+    try:
+        r = requests.get('http://hq.sinajs.cn/list=s_sh000300',
+                        headers={'Referer':'http://finance.sina.com.cn'}, timeout=TIMEOUT)
+        r.encoding = 'gbk'
+        fields = r.text.split('"')[1].split(',')
+        # 指数格式: [0]=名称 [1]=当前价 [2]=涨跌额 [3]=涨跌幅%
+        price = float(fields[1]) if fields[1] else 0
+        pct = float(fields[3]) if fields[3] else 0
+        return price, pct
+    except:
+        return None, None
+
 def decide(closes):
     dates = [c[0] for c in closes]; px = [c[1] for c in closes]
-    today, prev = px[-1], px[-2]
-    day_pct = (today/prev-1)*100; ma = sum(px[-MA_N:])/MA_N
+    
+    # 优先用实时价（盘后也保留收盘价），失败才用日K
+    rt_price, rt_pct = get_realtime_pct()
+    if rt_price and rt_pct is not None:
+        today = rt_price
+        day_pct = rt_pct
+    else:
+        today, prev = px[-1], px[-2]
+        day_pct = (today/prev-1)*100
+    
+    ma = sum(px[-MA_N:])/MA_N
     if day_pct < RED_DROP: gate, cap, t1 = "红", 30, False
     elif today > ma: gate, cap, t1 = "绿", 80, True
     else: gate, cap, t1 = "黄", 60, True

@@ -5,7 +5,6 @@
 职责: 给定关键词, 从多个中文财经快讯源拉取近期消息,
  本地过滤匹配, 输出带时间和出处的证据清单。
 
-多源: 财联社电报 → 东财7×24快讯 → 新浪财经滚动
 盲区: 全源断 → liubei_status.json 标记, 催化无法查证→降级纸面
 
 用法:
@@ -17,20 +16,12 @@
 import json, sys, datetime as dt, requests
 
 TIMEOUT = 6; FETCH_N = 60
-HEADERS = {"User-Agent": "Mozilla/5.0", "Referer": "https://www.cls.cn/"}
+HEADERS = {"User-Agent": "Mozilla/5.0"}
 
 def _get(url, headers=HEADERS):
     try:
         r = requests.get(url, headers=headers, timeout=TIMEOUT)
         return r.text if r.status_code == 200 and r.text else None
-    except: return None
-
-def parse_cls(raw):
-    try:
-        rows = json.loads(raw)["data"]["roll_data"]
-        return [{"time": dt.datetime.fromtimestamp(r["ctime"]).strftime("%m-%d %H:%M"),
-                 "title": (r.get("title") or r.get("content","")).strip(),
-                 "source": "财联社"} for r in rows] or None
     except: return None
 
 def parse_em(raw):
@@ -51,10 +42,6 @@ def parse_sina(raw):
 
 def keyword_filter(items, keywords):
     return [it for it in items if it["title"] and any(k in it["title"] for k in keywords)]
-
-def fetch_cls():
-    raw = _get(f"https://www.cls.cn/nodeapi/updateTelegraphList?rn={FETCH_N}")
-    return parse_cls(raw) if raw else None
 
 def fetch_em():
     url = f"https://np-listapi.eastmoney.com/comm/web/getFastNewsList?client=web&biz=web_724&fastColumn=102&pageSize={FETCH_N}&sortEnd=&req_trace=1"
@@ -81,7 +68,9 @@ def fetch_ths():
     raw = _get(url, {"User-Agent": "Mozilla/5.0", "Referer": "https://news.10jqka.com.cn/"})
     return parse_ths(raw) if raw else None
 
-SOURCES = [("财联社", fetch_cls), ("东财快讯", fetch_em), ("新浪财经", fetch_sina), ("同花顺", fetch_ths)]
+
+SOURCES = [("东财快讯", fetch_em), ("新浪财经", fetch_sina), ("同花顺", fetch_ths)]
+
 
 def gather():
     pool, health = [], {}
